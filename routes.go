@@ -26,15 +26,17 @@ func (a *App) Initialize() {
 }
 
 func (a *App) InitializeRoutes() {
+
 	a.Router.HandleFunc("/login", a.Login).Methods("POST")
 	a.Router.HandleFunc("/home", Home).Methods("GET")
+	a.Router.HandleFunc("/", a.SignUp).Methods("POST")
 	// //a.Router.HandleFunc("/Refresh", auth.Refresh).Methods(" GET")
 
 	a.Router.HandleFunc("/people/", a.GetAllPersons).Methods("GET")
 	a.Router.HandleFunc("/books/", a.GetAllBooks).Methods("GET")
 	//r.HandleFunc("/userswithbks", GetAllUsersWithBks).Methods("GET")
-	a.Router.HandleFunc("/", a.CreateUser).Methods("POST")
-	a.Router.HandleFunc("/user/{id}", a.UpdateUser).Methods("PUT")
+
+	//a.Router.HandleFunc("/user/{id}", a.UpdateUser).Methods("PUT")
 	a.Router.HandleFunc("/user/{id}", a.GetUserWithId).Methods("GET")
 	a.Router.HandleFunc("/userswithoutbooks", a.GetAllUsersWithoutBks).Methods("GET")
 	a.Router.HandleFunc("/availablebooks", GetUnAssignedBooks).Methods("GET")

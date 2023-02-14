@@ -2,7 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	// "errors"
+	// "io/ioutil"
 	"strconv"
 
 	"net/http"
@@ -79,32 +80,38 @@ func (a *App) GetUserWithId(w http.ResponseWriter, r *http.Request) {
 	JSON(w, http.StatusOK, userGotten)
 }
 
-func (a *App) CreateUser(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "Application/json")
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		ERROR(w, http.StatusUnprocessableEntity, err)
-	}
+// func (a *App) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
-	user := Person{}
-	err = json.Unmarshal(body, &user)
-	if err != nil {
-		ERROR(w, http.StatusUnprocessableEntity, err)
-		return
-	}
-	user.Prepare()
-	err = user.Validate("")
-	if err != nil {
-		ERROR(w, http.StatusUnprocessableEntity, err)
-		return
-	}
-	userCreated, err := user.SavePerson(a.DB)
-	if err != nil {
-		formattedError := FormatError(err.Error())
+// 	vars := mux.Vars(r)
+// 	uid, err := strconv.ParseUint(vars["id"], 10, 32)
+// 	if err != nil {
+// 		ERROR(w, http.StatusBadRequest, err)
+// 		return
+// 	}
+// 	body, err := ioutil.ReadAll(r.Body)
+// 	if err != nil {
+// 		ERROR(w, http.StatusUnprocessableEntity, err)
+// 		return
+// 	}
+// 	user := Person{}
+// 	err = json.Unmarshal(body, &user)
+// 	if err != nil {
+// 		ERROR(w, http.StatusUnprocessableEntity, err)
+// 	}
+// 	tokenID, err := ExtractTokenID(r)
+// 	if err != nil {
+// 		ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized"))
+// 		return
+// 	}
+// 	if tokenID != uint32(uid) {
+// 		ERROR(w, http.StatusUnauthorized, errors.New(http.StatusText(http.StatusUnauthorized)))
+// 		return
+// 	}
+// 	updatedUser, err := user.UpdateUser(a.DB, uint32(uid))
+// 	if err!= nil{
+// 		formattedError := FormatError(err.Error())
+// 		ERROR(w, http.StatusInternalServerError, formattedError)
+// 	}
+// 	JSON(w, http.StatusOK, updatedUser)
 
-		ERROR(w, http.StatusInternalServerError, formattedError)
-		return
-	}
-	w.Header().Set("Location", fmt.Sprintf("%s%s/%d", r.Host, r.RequestURI, userCreated.ID))
-	JSON(w, http.StatusCreated, userCreated)
-}
+// }
