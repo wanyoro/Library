@@ -80,6 +80,7 @@ func (a *App) GetUserWithId(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) CreateUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "Application/json")
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		ERROR(w, http.StatusUnprocessableEntity, err)
