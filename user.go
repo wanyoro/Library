@@ -45,6 +45,14 @@ func (p *Person) SavePerson(db *gorm.DB) (*Person, error) {
 	return p, nil
 }
 
+func (p *Person) GetUser(db *gorm.DB) (*Person, error) {
+	account := &Person{}
+	if err := db.Debug().Table("people").Where("email = ?", p.Email).First(account).Error; err != nil {
+		return nil, err
+	}
+	return account, nil
+}
+
 func GetAllPersons(db *gorm.DB) (*[]Person, error) {
 	people := []Person{}
 	if err := db.Debug().Table("people").Find(&people).Error; err != nil {

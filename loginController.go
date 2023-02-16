@@ -58,6 +58,13 @@ func (a *App) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user.Prepare()
+	newPassword, err := HashPassword(user.Password)
+	if err != nil {
+		ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	user.Password = newPassword
+
 	err = user.Validate("")
 	if err != nil {
 		ERROR(w, http.StatusUnprocessableEntity, err)
@@ -75,32 +82,32 @@ func (a *App) SignUp(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) Login(w http.ResponseWriter, r *http.Request) {
-	var credentials Credentials
-	var dbUser Person
-	var resp = map[string]interface{}{"status": "success", "message": "logged in"}
+	// var credentials Credentials
+	// var dbUser Person
+	// var resp = map[string]interface{}{"status": "success", "message": "logged in"}
 
-	err := json.NewDecoder(r.Body).Decode(&credentials)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
+	// err := json.NewDecoder(r.Body).Decode(&credentials)
+	// if err != nil {
+	// 	w.WriteHeader(http.StatusBadRequest)
+	// 	return
+	// }
 
-	dbName := a.DB.Debug().Find(&dbUser, "fullname", credentials.Fullname)
-	fmt.Printf("%s", dbUser.Password)
+	// dbName := a.DB.Debug().Find(&dbUser, "fullname", credentials.Fullname)
+	// fmt.Printf("%s", dbUser.Password)
 
-	if dbName.RowsAffected == 0 {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
+	// if dbName.RowsAffected == 0 {
+	// 	w.WriteHeader(http.StatusBadRequest)
+	// 	return
+	// }
 
-	err = bcrypt.CompareHashAndPassword([]byte(dbUser.Password), []byte(credentials.Password))
-	if err != nil {
-		ERROR(w, http.StatusUnauthorized, err)
-		fmt.Printf("%s", err)
-		return
-	}
+	// err = bcrypt.CompareHashAndPassword([]byte(dbUser.Password), []byte(credentials.Password))
+	// if err != nil {
+	// 	ERROR(w, http.StatusUnauthorized, err)
+	// 	fmt.Printf("%s", err)
+	// 	return
+	// }
 
-	fmt.Println("password matched")
+	// fmt.Println("password matched")
 
 	// expirationTime := time.Now().Add(time.Minute * 5)
 
@@ -123,12 +130,64 @@ func (a *App) Login(w http.ResponseWriter, r *http.Request) {
 	// 		Value:   tokenString,
 	// 		Expires: expirationTime,
 	// 	})
-	token, err := AuthToken(dbUser.ID)
-	fmt.Printf("%s", token)
+	// token, err := AuthToken(dbUser.ID)
+	// fmt.Printf("%s", token)
+	// if err != nil {
+	// 	ERROR(w, http.StatusBadRequest, err)
+	// 	return
+	// }
+	// resp["token"] = token
+	// JSON(w, http.StatusOK, resp)
+	// return
+	var resp = map[string]interface{}{"status": "success", "message": "logged in"}
+
+	user := Person{}
+	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		ERROR(w, http.StatusBadRequest, err)
 		return
 	}
+
+	err = json.Unmarshal(body, &user)
+	if err != nil {
+		ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+
+	user.Prepare()
+
+	err = user.Validate("login")
+	if err != nil {
+		ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+
+	usr, err := user.GetUser(a.DB)
+	if err != nil {
+		ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if usr == nil {
+		resp["status"] = "failed"
+		resp["message"] = "Login Failed, please signup"
+		JSON(w, http.StatusBadRequest, resp)
+		return
+	}
+
+	err = ComparePasswordHash(user.Password, usr.Password)
+	if err != nil {
+		resp["status"] = "failed"
+		resp["message"] = "Login failed, please try again"
+		JSON(w, http.StatusForbidden, err)
+		return
+	}
+	token, err := AuthToken(usr.ID)
+	if err != nil {
+		ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+
 	resp["token"] = token
 	JSON(w, http.StatusOK, resp)
 	return
