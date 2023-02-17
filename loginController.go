@@ -70,9 +70,10 @@ func (a *App) SignUp(w http.ResponseWriter, r *http.Request) {
 		ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
+
 	userCreated, err := user.SavePerson(a.DB)
 	if err != nil {
-		formattedError := FormatError(err.Error())
+		formattedError := user.FormatError(err.Error())
 
 		ERROR(w, http.StatusInternalServerError, formattedError)
 		return
@@ -139,6 +140,7 @@ func (a *App) Login(w http.ResponseWriter, r *http.Request) {
 	// resp["token"] = token
 	// JSON(w, http.StatusOK, resp)
 	// return
+	w.Header().Set("Content-Type", "Application/json")
 	var resp = map[string]interface{}{"status": "success", "message": "logged in"}
 
 	user := Person{}
