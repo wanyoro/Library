@@ -65,14 +65,14 @@ func (a *App) GetAllUsersWithoutBks(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) GetUserWithId(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "Application/json")
 	params := mux.Vars(r)
-	uid, err := strconv.ParseUint(params["id"], 10, 32)
+	id, err := strconv.Atoi(params["id"])
 	if err != nil {
 		ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	user := Person{}
-	userGotten, err := user.GetUserWithId(a.DB, uint32(uid))
+	userGotten, err := GetUserWithId(id, a.DB)
 	if err != nil {
 		ERROR(w, http.StatusBadRequest, err)
 		return

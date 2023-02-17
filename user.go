@@ -69,15 +69,15 @@ func GetAllUsersWithoutBks(db *gorm.DB) (*[]Person, error) {
 	return &people, nil
 }
 
-func (p *Person) GetUserWithId(db *gorm.DB, uid uint32) (*Person, error) {
+func GetUserWithId(id int, db *gorm.DB) (*Person, error) {
 	//params := mux.Vars(r)
 
-	var person Person
-	if err := db.Debug().Model(Person{}).Where("id= ?", uid).Take(&p).Error; err != nil {
+	user := &Person{}
+	if err := db.Debug().Table("people").Where("id= ?", id).First(user).Error; err != nil {
 		return &Person{}, err
 	}
 
-	return &person, nil
+	return user, nil
 }
 
 func (p *Person) UpdateUser(db *gorm.DB, uid uint32) (*Person, error) {
