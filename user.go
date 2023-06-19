@@ -2,9 +2,9 @@ package main
 
 import (
 	"errors"
-	"log"
+	//"log"
 	"strings"
-	"time"
+	//"time"
 
 	"github.com/badoux/checkmail"
 	"gorm.io/gorm"
@@ -61,6 +61,15 @@ func GetAllPersons(db *gorm.DB) (*[]Person, error) {
 	return &people, nil
 }
 
+func GetPeopleAndBooks(db *gorm.DB) (*[]Person, error) {
+	pnb := []Person{}
+	if err := db.Debug().Preload("Book").
+		Joins("INNER JOIN books ON books.person_id = people.id").Find(&pnb).Error; err != nil {
+		return &[]Person{}, err
+	}
+	return &pnb, nil
+}
+
 func GetAllUsersWithoutBks(db *gorm.DB) (*[]Person, error) {
 	people := []Person{}
 	if err := db.Raw("select books.*, people.* from books right outer join people on books.person_id=people.id where title is null").Scan(&people).Error; err != nil {
@@ -74,34 +83,35 @@ func GetUserWithId(id int, db *gorm.DB) (*Person, error) {
 
 	user := &Person{}
 	if err := db.Debug().Table("people").Where("id= ?", id).First(user).Error; err != nil {
-		return &Person{}, err
+		return nil, err
 	}
 
 	return user, nil
 }
 
-func (p *Person) UpdateUser(db *gorm.DB, uid uint32) (*Person, error) {
-	err := p.BeforeSave()
-	if err != nil {
-		log.Fatal(err)
-	}
-	db = db.Debug().Model(&Person{}).Where("id= ?", uid).Take(&Person{}).UpdateColumns(
-		map[string]interface{}{
-			"password":   p.Password,
-			"fullname":   p.Fullname,
-			"email":      p.Email,
-			"gender":     p.Gender,
-			"updated_at": time.Now(),
-		},
-	)
-	if db.Error != nil {
-		return &Person{}, db.Error
-	}
-	err = db.Debug().Model(&Person{}).Where("id =?", uid).Take(&p).Error
-	if err != nil {
+func (p *Person) UpdateUser(id int, db *gorm.DB) (*Person, error) {
+	// err := p.BeforeSave()
+	// if err != nil {
+	// 	log.Fatal(err)
+
+	if err := db.Debug().Table("people").Where("id= ?", id).Updates(Person{
+		Fullname: p.Fullname,
+		Email:    p.Email,
+		Password: p.Password,
+		Gender:   p.Gender,
+		Book:     p.Book}).Error; err != nil {
 		return &Person{}, err
 	}
 	return p, nil
+
+	// if db.Error != nil {
+	// 	return &Person{}, db.Error
+	// }
+	// err = db.Debug().Model(&Person{}).Where("id =?", uid).Take(&p).Error
+	// if err != nil {
+	// 	return &Person{}, err
+	// }
+	// return p, nil
 }
 
 func (p *Person) Validate(action string) error {

@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	// "errors"
-	// "io/ioutil"
+	//"errors"
+	//"io/ioutil"
 	"strconv"
 
 	"net/http"
@@ -41,16 +41,21 @@ func GetUserWithBkId(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(person)
 }
 
-func GetPeopleAndBooks(w http.ResponseWriter, r *http.Request) {
+func (a *App) GetPeopleAndBooks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "Application/json")
-	var db *gorm.DB
-	var psn []Person
-	err := db.Debug().Preload("Book").
-		Joins("INNER JOIN books ON books.person_id = people.id").Find(&psn).Error
+	pnb, err := GetPeopleAndBooks(a.DB)
 	if err != nil {
-		fmt.Println(err)
+		ERROR(w, http.StatusInternalServerError, err)
 	}
-	json.NewEncoder(w).Encode(&psn)
+	JSON(w, http.StatusOK, pnb)
+	return
+	// var db *gorm.DB
+	// var psn []Person
+	// err :=
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// json.NewEncoder(w).Encode(&psn)
 
 }
 
@@ -81,37 +86,45 @@ func (a *App) GetUserWithId(w http.ResponseWriter, r *http.Request) {
 }
 
 // func (a *App) UpdateUser(w http.ResponseWriter, r *http.Request) {
-
+// 	var resp = map[string]interface{}{"status": "success", "message": "user updated successfully"}
+// 	w.Header().Set("Content-Type", "Application/json")
 // 	vars := mux.Vars(r)
-// 	uid, err := strconv.ParseUint(vars["id"], 10, 32)
+
+// 	//user := r.Context().Value("personID").(float64)
+// 	//userID := uint(user)
+
+// 	id, _ := strconv.Atoi(vars["id"])
+
+// 	updateUser, err := GetUserWithId(id, a.DB)
+
+// 	// if updateUser.ID != userID {
+// 	// 	resp["status"] = "failed"
+// 	// 	resp["message"] = "Unautorized user update"
+// 	// 	JSON(w, http.StatusUnauthorized, resp)
+// 	// 	return
+// 	// }
+
+// 	body, err := ioutil.ReadAll(r.Body)
 // 	if err != nil {
 // 		ERROR(w, http.StatusBadRequest, err)
 // 		return
 // 	}
-// 	body, err := ioutil.ReadAll(r.Body)
-// 	if err != nil {
-// 		ERROR(w, http.StatusUnprocessableEntity, err)
+
+// 	updatedUser := Person{}
+// 	if err = json.Unmarshal(body, &updatedUser); err != nil {
+// 		ERROR(w, http.StatusBadRequest, err)
 // 		return
 // 	}
-// 	user := Person{}
-// 	err = json.Unmarshal(body, &user)
+
+// 	updatedUser.Prepare()
+
+// 	_, err = updatedUser.UpdateUser(id, a.DB)
 // 	if err != nil {
-// 		ERROR(w, http.StatusUnprocessableEntity, err)
-// 	}
-// 	tokenID, err := ExtractTokenID(r)
-// 	if err != nil {
-// 		ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized"))
+// 		ERROR(w, http.StatusInternalServerError, err)
 // 		return
 // 	}
-// 	if tokenID != uint32(uid) {
-// 		ERROR(w, http.StatusUnauthorized, errors.New(http.StatusText(http.StatusUnauthorized)))
-// 		return
-// 	}
-// 	updatedUser, err := user.UpdateUser(a.DB, uint32(uid))
-// 	if err!= nil{
-// 		formattedError := FormatError(err.Error())
-// 		ERROR(w, http.StatusInternalServerError, formattedError)
-// 	}
-// 	JSON(w, http.StatusOK, updatedUser)
+
+// 	JSON(w, http.StatusOK, resp)
+// 	return
 
 // }
