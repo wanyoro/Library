@@ -70,10 +70,9 @@ func (a *App) SignUp(w http.ResponseWriter, r *http.Request) {
 		ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-
 	userCreated, err := user.SavePerson(a.DB)
 	if err != nil {
-		formattedError := user.FormatError(err.Error())
+		formattedError := FormatError(err.Error())
 
 		ERROR(w, http.StatusInternalServerError, formattedError)
 		return

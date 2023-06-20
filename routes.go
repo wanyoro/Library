@@ -26,23 +26,27 @@ func (a *App) Initialize() {
 }
 
 func (a *App) InitializeRoutes() {
-
+	a.Router.Use(SetContentTypeMiddleware)
 	a.Router.HandleFunc("/login", a.Login).Methods("POST")
 	a.Router.HandleFunc("/home", Home).Methods("GET")
 	a.Router.HandleFunc("/", a.SignUp).Methods("POST")
+
+	// s := a.Router.PathPrefix("/api").Subrouter()
+	// s.Use(middleware.AuthJWTVerify)
+
 	// //a.Router.HandleFunc("/Refresh", auth.Refresh).Methods(" GET")
 
-	a.Router.HandleFunc("/people/", a.GetAllPersons).Methods("GET")
-	a.Router.HandleFunc("/books/", a.GetAllBooks).Methods("GET")
-	//r.HandleFunc("/userswithbks", GetAllUsersWithBks).Methods("GET")
+	a.Router.HandleFunc("/people/", AuthJWTVerify(a.GetAllPersons)).Methods("GET")
+	a.Router.HandleFunc("/books/", AuthJWTVerify(a.GetAllBooks)).Methods("GET")
+	a.Router.HandleFunc("/userswithbks", a.GetAllUsersWithBks).Methods("GET")
 
-	//a.Router.HandleFunc("/user/{id}", a.UpdateUser).Methods("PUT")
+	//a.Router.HandleFunc("/users/{id}", AuthJWTVerify(a.UpdateUser)).Methods("PUT")
 	a.Router.HandleFunc("/user/{id}", a.GetUserWithId).Methods("GET")
 	a.Router.HandleFunc("/userswithoutbooks", a.GetAllUsersWithoutBks).Methods("GET")
-	a.Router.HandleFunc("/availablebooks", GetUnAssignedBooks).Methods("GET")
+	a.Router.HandleFunc("/availablebooks", a.GetUnAssignedBooks).Methods("GET")
 	a.Router.HandleFunc("/book/{person_id}", GetUserWithBkId).Methods("GET")
-	a.Router.HandleFunc("/book/", CreateBook).Methods("POST")
-	a.Router.HandleFunc("/peoplebooks", GetPeopleAndBooks).Methods("GET")
+	a.Router.HandleFunc("/book/", AuthJWTVerify(a.CreateBook)).Methods("POST")
+	a.Router.HandleFunc("/peoplebooks", a.GetPeopleAndBooks).Methods("GET")
 	a.Router.HandleFunc("/assignedBks", GetAllAssignedBooks).Methods("GET")
 }
 

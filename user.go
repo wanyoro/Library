@@ -78,6 +78,14 @@ func GetAllUsersWithoutBks(db *gorm.DB) (*[]Person, error) {
 	return &people, nil
 }
 
+func GetAllUsersWithBks(db *gorm.DB) (*[]Person, error) {
+	people := []Person{}
+	if err := db.Raw("select books.*, people.* from books inner join people on books.person_id=people.id where title is not null").Scan(&people).Error; err != nil {
+		return &[]Person{}, err
+	}
+	return &people, nil
+}
+
 func GetUserWithId(id int, db *gorm.DB) (*Person, error) {
 	//params := mux.Vars(r)
 

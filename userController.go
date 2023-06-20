@@ -69,6 +69,16 @@ func (a *App) GetAllUsersWithoutBks(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func (a *App) GetAllUsersWithBks(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "Application/json")
+	users, err := GetAllUsersWithBks(a.DB)
+	if err != nil {
+		ERROR(w, http.StatusInternalServerError, err)
+	}
+	JSON(w, http.StatusOK, users)
+	return
+}
+
 func (a *App) GetUserWithId(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "Application/json")
 	params := mux.Vars(r)
