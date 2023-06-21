@@ -38,9 +38,8 @@ func GetUnassignedBooks(db *gorm.DB) (*[]Book, error) {
 }
 
 func (b *Book) CreatedBook(db *gorm.DB) (*Book, error) {
-	var err error
-	err = db.Debug().Create(&b).Error
-	if err != nil {
+
+	if err := db.Debug().Create(&b).Error; err != nil {
 		return &Book{}, err
 	}
 	return b, nil

@@ -191,7 +191,7 @@ func (a *App) Login(w http.ResponseWriter, r *http.Request) {
 
 	resp["token"] = token
 	JSON(w, http.StatusOK, resp)
-	return
+	
 }
 
 func Home(w http.ResponseWriter, r *http.Request) {
