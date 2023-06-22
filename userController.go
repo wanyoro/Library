@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"io/ioutil"
+
 	//"errors"
 	//"io/ioutil"
 	"strconv"
@@ -76,6 +78,44 @@ func (a *App) GetAllUsersWithBks(w http.ResponseWriter, r *http.Request) {
 		ERROR(w, http.StatusInternalServerError, err)
 	}
 	JSON(w, http.StatusOK, users)
+	return
+}
+
+func (a *App) UpdateUser(w http.ResponseWriter, r *http.Request) {
+	var resp = map[string]interface{}{"status": "success", "message": "User updated successfully"}
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	userGotten, err := GetUserWithId(id, a.DB)
+	if err != nil {
+		ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	err = json.Unmarshal(body, &userGotten)
+	if err != nil {
+		ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	newPassword, err := HashPassword(userGotten.Password)
+	if err != nil {
+		ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	userGotten.Password = newPassword
+	_, err = userGotten.UpdateUser(id, a.DB)
+	if err != nil {
+		ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	JSON(w, http.StatusOK, resp)
 	return
 }
 

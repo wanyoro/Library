@@ -40,7 +40,7 @@ func (a *App) InitializeRoutes() {
 	a.Router.HandleFunc("/books/", AuthJWTVerify(a.GetAllBooks)).Methods("GET")
 	a.Router.HandleFunc("/userswithbks", a.GetAllUsersWithBks).Methods("GET")
 
-	//a.Router.HandleFunc("/users/{id}", AuthJWTVerify(a.UpdateUser)).Methods("PUT")
+	a.Router.HandleFunc("/users/{id}", a.UpdateUser).Methods("PUT")
 	a.Router.HandleFunc("/user/{id}", a.GetUserWithId).Methods("GET")
 	a.Router.HandleFunc("/userswithoutbooks", a.GetAllUsersWithoutBks).Methods("GET")
 	a.Router.HandleFunc("/availablebooks", a.GetUnAssignedBooks).Methods("GET")
