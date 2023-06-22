@@ -11,6 +11,7 @@ import (
 
 func (a *App) CreateBook(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content_Type", "Application/json")
+	user := Person{}
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		ERROR(w, http.StatusUnprocessableEntity, err)
@@ -29,7 +30,7 @@ func (a *App) CreateBook(w http.ResponseWriter, r *http.Request) {
 	}
 	bookCreated, err := book.CreatedBook(a.DB)
 	if err != nil {
-		formattedError := FormatError(err.Error())
+		formattedError := user.FormatError(err.Error())
 
 		ERROR(w, http.StatusInternalServerError, formattedError)
 		return

@@ -46,6 +46,7 @@ func ComparePasswordHash(password, hash string) error {
 }
 func (a *App) SignUp(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "Application/json")
+	var resp = map[string]interface{}{"status": "success", "message": "Registered successfully"}
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		ERROR(w, http.StatusUnprocessableEntity, err)
@@ -55,6 +56,13 @@ func (a *App) SignUp(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(body, &user)
 	if err != nil {
 		ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	usr, _ := user.GetUser(a.DB)
+	if usr != nil {
+		resp["status"] = "failed"
+		resp["message"] = "User already registered, please login"
+		JSON(w, http.StatusBadRequest, resp)
 		return
 	}
 	user.Prepare()
@@ -70,13 +78,18 @@ func (a *App) SignUp(w http.ResponseWriter, r *http.Request) {
 		ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-	userCreated, err := user.SavePerson(a.DB)
+	err = user.FormatError("")
 	if err != nil {
-		formattedError := FormatError(err.Error())
-
-		ERROR(w, http.StatusInternalServerError, formattedError)
+		ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
+	userCreated, err := user.SavePerson(a.DB)
+	// if err != nil {
+	// 	formattedError := FormatError(err.Error())
+
+	// 	ERROR(w, http.StatusInternalServerError, formattedError)
+	// 	return
+	// }
 	w.Header().Set("Location", fmt.Sprintf("%s%s/%d", r.Host, r.RequestURI, userCreated.ID))
 	JSON(w, http.StatusCreated, userCreated)
 }
@@ -191,7 +204,7 @@ func (a *App) Login(w http.ResponseWriter, r *http.Request) {
 
 	resp["token"] = token
 	JSON(w, http.StatusOK, resp)
-	
+
 }
 
 func Home(w http.ResponseWriter, r *http.Request) {

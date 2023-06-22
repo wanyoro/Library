@@ -156,10 +156,10 @@ func (p *Person) Validate(action string) error {
 
 	default:
 		if p.Email == "" {
-			return errors.New("required password")
+			return errors.New("required email")
 		}
 		if p.Fullname == "" {
-			return errors.New("required fullname")
+			return errors.New("required username")
 		}
 		if p.Password == "" {
 			return errors.New("required password")
@@ -175,7 +175,7 @@ func (p *Person) Validate(action string) error {
 	}
 
 }
-func FormatError(err string) error {
+func (p *Person) FormatError(err string) error {
 	if strings.Contains(err, "fullname") {
 		return errors.New("nickname already taken")
 	}
@@ -185,5 +185,5 @@ func FormatError(err string) error {
 	if strings.Contains(err, "hashedPassword") {
 		return errors.New("incorrect password")
 	}
-	return errors.New("incorrect details")
+	return nil
 }
