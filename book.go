@@ -45,6 +45,14 @@ func (b *Book) CreatedBook(db *gorm.DB) (*Book, error) {
 	return b, nil
 }
 
+func GetBookById(id int, db *gorm.DB) (*Book, error) {
+	book := &Book{}
+	if err := db.Debug().Table("books").Where("id = ?", id).First(book).Error; err != nil {
+
+	}
+	return book, nil
+}
+
 //w.Header().Set("Content-Type", "Application/json")
 // body, err := ioutil.ReadAll(r.Body)
 // if err != nil {
@@ -109,4 +117,11 @@ func (b *Book) Prepare() {
 	b.Author = strings.TrimSpace(b.Author)
 	b.Title = strings.TrimSpace(b.Title)
 	b.Isbn = strings.TrimSpace(b.Isbn)
+}
+
+func (b *Book) DeleteBook(id int, db *gorm.DB) error {
+	if err := db.Debug().Table("books").Where("id=?", id).Delete(&Book{}).Error; err != nil {
+		return err
+	}
+	return nil
 }
