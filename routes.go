@@ -49,7 +49,7 @@ func (a *App) InitializeRoutes() {
 	a.Router.HandleFunc("/book/", AuthJWTVerify(a.CreateBook)).Methods("POST")
 	a.Router.HandleFunc("/peoplebooks", a.GetPeopleAndBooks).Methods("GET")
 	a.Router.HandleFunc("/assignedBks", GetAllAssignedBooks).Methods("GET")
-	a.Router.HandleFunc("/deleteBook/{id}", a.DeleteBook).Methods("DELETE")
+	a.Router.HandleFunc("/deleteBook/{id}", AuthJWTVerify(a.DeleteBook)).Methods("DELETE")
 }
 
 func (a *App) RunServer() {

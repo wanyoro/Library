@@ -112,14 +112,6 @@ func (p *Person) UpdateUser(id int, db *gorm.DB) (*Person, error) {
 	}
 	return p, nil
 
-	// if db.Error != nil {
-	// 	return &Person{}, db.Error
-	// }
-	// err = db.Debug().Model(&Person{}).Where("id =?", uid).Take(&p).Error
-	// if err != nil {
-	// 	return &Person{}, err
-	// }
-	// return p, nil
 }
 
 func (p *Person) Validate(action string) error {
