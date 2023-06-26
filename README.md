@@ -1,7 +1,7 @@
 
 # Library
 
-### Library is a system used to manage an instituion's Library using books and users
+### Library is a system used to manage an institution's Library using books and users.
 
 ### Installation.
 Should have Go and Postgres installed
