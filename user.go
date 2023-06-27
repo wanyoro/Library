@@ -98,9 +98,6 @@ func GetUserWithId(id int, db *gorm.DB) (*Person, error) {
 }
 
 func (p *Person) UpdateUser(id int, db *gorm.DB) (*Person, error) {
-	// err := p.BeforeSave()
-	// if err != nil {
-	// 	log.Fatal(err)
 
 	if err := db.Debug().Table("people").Where("id= ?", id).Updates(Person{
 		Fullname: p.Fullname,

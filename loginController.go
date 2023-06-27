@@ -245,10 +245,6 @@ func Home(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// func Refresh(w http.ResponseWriter, r *http.Request) {
-
-// }
-
 func Pretty(data interface{}) {
 	b, err := json.MarshalIndent(data, "", " ")
 	if err != nil {
@@ -257,8 +253,3 @@ func Pretty(data interface{}) {
 	}
 	fmt.Println(string(b))
 }
-
-// func (a *App) LogoutUser(w http.ResponseWriter, r*http.Request)error{
-// 	expired := time.Now().Add(-time.Hour *24)
-
-// }
