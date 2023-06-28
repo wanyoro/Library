@@ -7,8 +7,9 @@
 Should have Go and Postgres installed
 
 Clone the repository
-
+<pre>
 $ https://github.com/wanyoro/Library.git
+</pre>
 
 
 
