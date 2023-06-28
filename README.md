@@ -6,6 +6,10 @@
 ### Installation.
 Should have Go and Postgres installed
 
+Clone the repository
+
+https://github.com/wanyoro/Library.git
+
 
 
 ### Environment variables
